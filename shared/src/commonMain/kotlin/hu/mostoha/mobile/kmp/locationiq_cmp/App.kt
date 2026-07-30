@@ -123,6 +123,13 @@ fun App() {
                     .fillMaxWidth()
                     .semantics { contentType = ContentType.PostalAddress },
             )
+            if (uiState.result.isNotEmpty()) {
+                Text(
+                    text = uiState.result,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 12.dp),
+                )
+            }
         }
     }
 }
