@@ -4,12 +4,19 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -60,11 +67,11 @@ fun App() {
             modifier = Modifier
                 .fillMaxSize()
                 .background(LiqBackground)
-                .safeContentPadding()
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
                 .pointerInput(Unit) {
                     detectTapGestures { focusManager.clearFocus() }
                 }
-                .padding(16.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
@@ -123,12 +130,23 @@ fun App() {
                     .fillMaxWidth()
                     .semantics { contentType = ContentType.PostalAddress },
             )
-            if (uiState.result.isNotEmpty()) {
-                Text(
-                    text = uiState.result,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 12.dp),
-                )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(top = 12.dp),
+                contentPadding = PaddingValues(
+                    bottom = WindowInsets.safeDrawing.asPaddingValues().calculateBottomPadding()
+                ),
+            ) {
+                if (uiState.result.isNotEmpty()) {
+                    item {
+                        Text(
+                            text = uiState.result,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
             }
         }
     }

@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -20,11 +20,12 @@ import kotlinx.coroutines.flow.update
 import kotlin.time.Duration.Companion.milliseconds
 
 private val DEBOUNCE_TIMEOUT = 1100.milliseconds
-private val SIMULATED_CALL_DELAY = 300.milliseconds
 private const val MIN_QUERY_LENGTH = 3
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-class GeocodingViewModel : ViewModel() {
+class GeocodingViewModel(
+    private val repository: LocationIqRepository = LocationIqRepository(),
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GeocodingUiState())
     val uiState: StateFlow<GeocodingUiState> = _uiState.asStateFlow()
@@ -40,10 +41,10 @@ class GeocodingViewModel : ViewModel() {
             .launchIn(viewModelScope)
     }
 
-    // Simulated API call
     private fun search(query: String) = flow {
-        delay(SIMULATED_CALL_DELAY)
-        emit("Simulated result arrived for: $query")
+        emit(NetworkClient.prettyJson.encodeToString(repository.autocomplete(query)))
+    }.catch {
+        emit("Search failed: ${it.message}")
     }
 
     fun onQueryChanged(query: String) {
