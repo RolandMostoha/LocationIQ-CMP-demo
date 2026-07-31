@@ -34,7 +34,7 @@ class LocationIqRepository(
      */
     suspend fun autocomplete(
         query: String,
-        limit: Int = 5,
+        limit: Int = 20,
         countryCodes: String? = null,
         acceptLanguage: String = "en",
         tag: String? = null,

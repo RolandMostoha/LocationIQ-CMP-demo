@@ -33,18 +33,18 @@ class GeocodingViewModel(
     init {
         _uiState
             .map { it.query.trim() }
+            .distinctUntilChanged()
             .filter { it.length >= MIN_QUERY_LENGTH }
             .debounce(DEBOUNCE_TIMEOUT)
-            .distinctUntilChanged()
             .flatMapLatest { query -> search(query) }
-            .onEach { result -> _uiState.update { it.copy(result = result) } }
+            .onEach { places -> _uiState.update { it.copy(places = places) } }
             .launchIn(viewModelScope)
     }
 
     private fun search(query: String) = flow {
-        emit(NetworkClient.prettyJson.encodeToString(repository.autocomplete(query)))
+        emit(repository.autocomplete(query).toPlaces())
     }.catch {
-        emit("Search failed: ${it.message}")
+        emit(emptyList())
     }
 
     fun onQueryChanged(query: String) {
@@ -52,11 +52,11 @@ class GeocodingViewModel(
     }
 
     fun onQueryCleared() {
-        _uiState.update { it.copy(query = "", result = "") }
+        _uiState.update { it.copy(query = "", places = emptyList()) }
     }
 }
 
 data class GeocodingUiState(
     val query: String = "",
-    val result: String = "",
+    val places: List<Place> = emptyList(),
 )

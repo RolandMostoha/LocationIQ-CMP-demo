@@ -17,12 +17,14 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +36,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.contentType
@@ -49,12 +50,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import locationiqcmp.shared.generated.resources.Res
 import locationiqcmp.shared.generated.resources.ic_location_iq_logo
 import org.jetbrains.compose.resources.painterResource
-
-private val LiqBackground = Color(0xFFFDF8F6)
-private val LiqRed = Color(0xFFF1654A)
-private val LiqCoral = Color(0xFFF9A79C)
-private val ClearBackground = Color(0xFFE4E4E4)
-private val ClearForeground = Color(0xFF5F6B70)
 
 @Composable
 @Preview
@@ -139,12 +134,13 @@ fun App() {
                     bottom = WindowInsets.safeDrawing.asPaddingValues().calculateBottomPadding()
                 ),
             ) {
-                if (uiState.result.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = uiState.result,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
+                itemsIndexed(
+                    items = uiState.places,
+                    key = { _, place -> place.id },
+                ) { index, place ->
+                    PlaceRow(place)
+                    if (index != uiState.places.lastIndex) {
+                        HorizontalDivider(color = LiqDivider)
                     }
                 }
             }
