@@ -3,6 +3,7 @@ package hu.mostoha.mobile.kmp.locationiq_cmp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -24,6 +25,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.HourglassEmpty
+import androidx.compose.material.icons.outlined.Key
+import androidx.compose.material.icons.outlined.SearchOff
+import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -125,24 +130,72 @@ fun App() {
                     .fillMaxWidth()
                     .semantics { contentType = ContentType.PostalAddress },
             )
-            LazyColumn(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(top = 12.dp),
-                contentPadding = PaddingValues(
-                    bottom = WindowInsets.safeDrawing.asPaddingValues().calculateBottomPadding()
-                ),
+                contentAlignment = Alignment.TopCenter,
             ) {
-                itemsIndexed(
-                    items = uiState.places,
-                    key = { _, place -> place.id },
-                ) { index, place ->
-                    PlaceRow(place)
-                    if (index != uiState.places.lastIndex) {
-                        HorizontalDivider(color = LiqDivider)
-                    }
+                val stateModifier = Modifier.padding(top = 48.dp)
+                when (val result = uiState.result) {
+                    PlacesResult.Idle -> Unit
+                    PlacesResult.Loading -> LoadingView(stateModifier)
+                    is PlacesResult.Places -> PlaceList(result.places)
+                    is PlacesResult.Empty -> InfoView(
+                        icon = Icons.Outlined.SearchOff,
+                        title = "No places found",
+                        message = "We couldn't find a match for \"${result.query}\". " +
+                            "Try a different spelling or a nearby landmark.",
+                        modifier = stateModifier,
+                    )
+                    is PlacesResult.Error -> ErrorView(result.reason, stateModifier)
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ErrorView(reason: ErrorReason, modifier: Modifier = Modifier) {
+    when (reason) {
+        ErrorReason.INVALID_API_KEY -> InfoView(
+            icon = Icons.Outlined.Key,
+            title = "API key rejected",
+            message = "LocationIQ didn't accept the API key. Check the key in " +
+                "LocationIqConfig.kt and that it is allowed to call the autocomplete endpoint.",
+            modifier = modifier,
+        )
+        ErrorReason.RATE_LIMITED -> InfoView(
+            icon = Icons.Outlined.HourglassEmpty,
+            title = "Too many searches",
+            message = "You have hit the LocationIQ rate limit. Wait a moment, then type again.",
+            modifier = modifier,
+        )
+        ErrorReason.UNAVAILABLE -> InfoView(
+            icon = Icons.Outlined.WarningAmber,
+            title = "Search unavailable",
+            message = "We couldn't reach LocationIQ. Check your connection and try again.",
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun PlaceList(places: List<Place>) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            bottom = WindowInsets.safeDrawing.asPaddingValues().calculateBottomPadding()
+        ),
+    ) {
+        itemsIndexed(
+            items = places,
+            key = { _, place -> place.id },
+        ) { index, place ->
+            PlaceRow(place)
+            if (index != places.lastIndex) {
+                HorizontalDivider(color = LiqDivider)
             }
         }
     }

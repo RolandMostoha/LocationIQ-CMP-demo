@@ -14,7 +14,7 @@ data class Place(
     val longitude: Double,
 )
 
-fun List<PlaceDto>.toPlaces(): List<Place> = map { it.toPlace() }
+fun List<PlaceDto>.toPlaces(): List<Place> = map { it.toPlace() }.distinctBy { it.id }
 
 private fun PlaceDto.toPlace(): Place {
     val id = "$osmType/$osmId"
