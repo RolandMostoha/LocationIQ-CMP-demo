@@ -1,6 +1,10 @@
 # LocationIQ Autocomplete with Compose Multiplatform
 
 [![Android Weekly](https://androidweekly.net/issues/issue-754/badge)](https://androidweekly.net/issues/issue-754)
+[![Medium](https://img.shields.io/badge/Medium-Read%20the%20article-black?logo=medium)](https://medium.com/@RolandMostoha/how-to-avoid-burning-your-rate-limit-autocomplete-in-compose-multiplatform-4e57e28b7c32)
+
+📖 Read the full walkthrough on Medium:
+[How to avoid burning your rate limit: autocomplete in Compose Multiplatform](https://medium.com/@RolandMostoha/how-to-avoid-burning-your-rate-limit-autocomplete-in-compose-multiplatform-4e57e28b7c32)
 
 A small Compose Multiplatform demo that wires the
 [LocationIQ Autocomplete API](https://docs.locationiq.com/docs/autocomplete) into an Android and iOS project.
