@@ -1,5 +1,7 @@
 # LocationIQ Autocomplete with Compose Multiplatform
 
+[![Android Weekly](https://androidweekly.net/issues/issue-754/badge)](https://androidweekly.net/issues/issue-754)
+
 A small Compose Multiplatform demo that wires the
 [LocationIQ Autocomplete API](https://docs.locationiq.com/docs/autocomplete) into an Android and iOS project.
 
